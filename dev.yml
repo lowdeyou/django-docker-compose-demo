@@ -1,0 +1,54 @@
+version: "3"
+
+volumes:
+  invitation_postgres_data: {}
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./docker/dev/django/Dockerfile
+    image: invitation_django
+    container_name: invitation_django
+    depends_on:
+      - postgres
+    volumes:
+      - ./project:/app:z
+    env_file:
+      - ./.envs/.dev/.django
+      - ./.envs/.dev/.postgres
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "python manage.py migrate && python manage.py runserver 
+      0.0.0.0:8000"
+
+  postgres:
+    image: postgres:13-alpine
+    container_name: invitation_postgres
+    volumes:
+      - invitation_postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./.envs/.dev/.postgres
+
+  rabbitmq:
+    image: rabbitmq:3.8
+    container_name: invitation_rabbitmq
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: invitation_mailhog
+    ports:
+      - "8025:8025"
+
+  celeryworker:
+    <<: *django
+    image: invitation_celeryworker
+    container_name: invitation_celeryworker
+    depends_on:
+      - rabbitmq
+      - postgres
+    ports: []
+    command: >
+      sh -c "watchmedo auto-restart --directory=./ --pattern='*.py'
+      --recursive -- celery -A project.celery_app worker -l INFO"

@@ -1,0 +1,12 @@
+{% extends "invitation/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<h1 class="mt-2">Send Invitation(s)</h1>
+<hr class="mt-0 mb-4">
+<form method="post">
+    {% csrf_token %}
+    <p>Confirm sending of invitation emails to all the invitees?</p>
+    <a class="btn btn-secondary" href="{% url 'invitee-list' %}">Back</a>
+    <input class="btn btn-danger" type="submit" value="Confirm" />
+</form>
+{% endblock %}

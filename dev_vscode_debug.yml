@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  django:
+    ports:
+      - "8000:8000"
+      - "6000:6000"
+    command: >
+      sh -c "python manage.py migrate && 
+      python -m debugpy --listen 0.0.0.0:6000 manage.py runserver 0.0.0.0:8000"
+
+  celeryworker:
+    ports:
+      - "6001:6001"
+    command: >
+      sh -c "watchmedo auto-restart --directory=./ --pattern='*.py' 
+      --recursive -- python -m debugpy --listen 0.0.0.0:6001 -m celery -A 
+      project.celery_app worker -l INFO"

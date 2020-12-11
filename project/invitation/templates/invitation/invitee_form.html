@@ -1,0 +1,12 @@
+{% extends "invitation/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<h1 class="mt-2">Add New Invitation</h1>
+<hr class="mt-0 mb-4">
+<form method="post">
+  {% csrf_token %}
+  {{ form|crispy }}
+  <a class="btn btn-secondary" href="{% url 'invitee-list' %}">Back</a>
+  <button type="submit" class="btn btn-primary">Add</button>
+</form>
+{% endblock %}
