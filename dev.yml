@@ -49,6 +49,7 @@ services:
       - rabbitmq
       - postgres
     ports: []
+    # Uses watchdog to perform hot reload for celery
     command: >
       sh -c "watchmedo auto-restart --directory=./ --pattern='*.py'
       --recursive -- celery -A project.celery_app worker -l INFO"
